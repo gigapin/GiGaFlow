@@ -2,7 +2,7 @@
 /*
  * This file is part of the GiGaFlow package.
  *
- * (c) Giuseppe Galari <giga.webdev@protonmail.com>
+ * (c) Giuseppe Galari <gigaprog@protonmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@ use Exception;
  * Manage routing table and dispatch the http requests to application
  *
  * @package Src\Router
- * @author GiGa <giga.webdev@protonmail.com>
+ * @author GiGa <gigaprog@protonmail.com>
  * @version 1.0.0
  */
 class Router implements RouterInterface
@@ -98,7 +98,7 @@ class Router implements RouterInterface
                     $this->params['action'] = $routeParams[2];
                     $this->params['wildcard'] = $matches[1];
                 } else {
-                    throw new UnexpectedValueException('Invalid value inserted into routing table');
+                    throw new \UnexpectedValueException('Invalid value inserted into routing table');
                 }
 
                 if (isset($param['namespace'])) {
