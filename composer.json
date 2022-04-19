@@ -1,0 +1,26 @@
+{
+    "name": "vendor/gigaflow",
+    "description": "Micro PHP framework",
+    "type": "library",
+    "require": {
+        "php": ">=7.4",
+        "twig/twig": "^3.0"
+    },
+    "require-dev": {
+        "composer/composer": "^2.1"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Src\\": "src/",
+            "App\\": "app/"
+        },
+        "files": ["helpers/functions.php"]
+    },
+    "authors": [
+        {
+            "name": "Giuseppe Galari",
+            "email": "giga.webdev@protonmail.com"
+        }
+    ]
+}
