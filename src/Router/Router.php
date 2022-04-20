@@ -2,7 +2,7 @@
 /*
  * This file is part of the GiGaFlow package.
  *
- * (c) Giuseppe Galari <gigaprog@protonmail.com>
+ * (c) Giuseppe Galari <giga.webdev@protonmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@ use Exception;
  * Manage routing table and dispatch the http requests to application
  *
  * @package Src\Router
- * @author GiGa <gigaprog@protonmail.com>
+ * @author GiGa <giga.webdev@protonmail.com>
  * @version 1.0.0
  */
 class Router implements RouterInterface
@@ -63,8 +63,28 @@ class Router implements RouterInterface
         if ($namespace !== null) {
             $this->routes[$regexRoute]['namespace'] = $namespace;
         }
-
+        
         return $this->routes;
+    }
+
+    /**
+     * Set namespace
+     *
+     * @return 
+     */
+    protected function getNamespace($controller)
+    {
+        foreach($this->routes as $route) {
+            if (in_array($controller, $route)) {
+                if (isset($route['namespace'])) {
+                    return "App\Controllers\\" . ucfirst($route['namespace']) . "\\";
+                }
+                
+            }
+        }
+       
+        return $this->namespace;
+        
     }
 
     /**
@@ -74,110 +94,43 @@ class Router implements RouterInterface
      * @param $url
      * @return bool
      */
-    public function match($url): bool
+    public function match($controller, $action, $param)
     {
-        foreach ($this->routes as $route => $param) {
-            // $param get route table 1. controller 2. action
-            if (preg_match($route, $url, $matches)) {
-                // Explode the url matched
-                $routeParams = explode("/", $matches[0]);
-                // First value is always the controller
-                $this->params['controller'] = $routeParams[0];
-
-                if ($routeParams[1] === null && $param[1] === 'index') {
-                    // If the url haven't second parameter and into route table the action is index
-                    // it going to call index method
-                    $this->params['action'] = 'index';
-                } elseif ($routeParams[1] !== null && $param[1] === $routeParams[1]) {
-                    $this->params['action'] = $routeParams[1];
-                    // Check if exists a third param and set it within wildcard key
-                    if (isset($routeParams[2])) {
-                        $this->params['wildcard'] = $matches[1];
-                    }
-                } elseif ($routeParams[1] !== null && $param[1] !== $routeParams[1]) {
-                    $this->params['action'] = $routeParams[2];
-                    $this->params['wildcard'] = $matches[1];
-                } else {
-                    throw new \UnexpectedValueException('Invalid value inserted into routing table');
-                }
-
-                if (isset($param['namespace'])) {
-                    $this->params['namespace'] = $param['namespace'];
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Set namespace
-     *
-     * @return false|mixed
-     */
-    protected function getNameSpace()
-    {
-        if (isset($this->params['namespace'])) {
-            $class = ucfirst($this->params['namespace']);
-            if (is_dir("../app/Controllers/$class")) {
-                return $this->params['namespace'];
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @param $url
-     * @throws Exception
-     */
-    public function dispatch($url)
-    {
-        $url = $this->removeQueryStringVariables($url);
-        
-        if ($this->match($url)) {
-            $controller = $this->params['controller'];
-            $action = $this->params['action'];
-            
-            if (false !== $this->getNameSpace()) {
-                $classController = $this->namespace . ucfirst($this->getNameSpace()) . '\\' . ucfirst($controller) . $this->controllerSuffix;
-            } else {
-                $classController = $this->namespace . ucfirst($controller) . $this->controllerSuffix;
-            }
-
-            if (class_exists($classController)) {
-                $obj = new $classController;
-                $action = $action . $this->actionSuffix;
-                if (method_exists($obj, $action)) {
-                    call_user_func_array([$obj, $action], $this->params);
-                } else {
-                    throw new Exception("Method not found");
-                }
-            } else {
-                throw new Exception("Class not found");
-            }
-        } else if($url === 'index.php') {
-            if ($this->match(''))  {
-                $classController = $this->namespace . ucfirst($this->defaultController);
-                if (class_exists($classController)) {
-                    $obj = new $classController;
-                    if (method_exists($obj, $this->defaultAction)) {
-                        call_user_func_array([$obj, $this->defaultAction], $this->params);
-                    } else {
-                        throw new Exception("Method not found");
-                    }
-                } else {
-                    throw new Exception("Class not found");
-                }
+        $class = $this->getNamespace($controller) . $controller;
+        if (class_exists($class)) {
+            $instanceOfClass = new $class();
+            if (method_exists($instanceOfClass, $action)) {
+                call_user_func_array([$instanceOfClass, $action], [$param]);
             }
         } else {
-            throw new Exception('No route matched', 404);
+            echo "Class not found";
+        }
+       
+    }
+
+
+    /**
+     * @param string $path
+     * 
+     * @return [type]
+     */
+    public function dispatch(string $path)
+    {
+        $url = explode('/', $path);
+        
+        foreach ($this->routes as $k => $route) {
+            if (preg_match($k, $path)) {
+                $controller = $route[0];
+                $action = $route[1];
+                if (isset($url[3])) {
+                    $param = $url[3];
+                } else {
+                    $param = "";
+                }
+            } 
         }
 
+        return $this->match($controller, $action, $param);       
     }
 
     /**
