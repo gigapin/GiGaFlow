@@ -8,9 +8,11 @@
  * file that was distributed with this source code.
  */
 
+use App\Controllers\HomeController;
+
 /** @var $route */
 
 /** HOME */
-$route->map('', 'HomeController@index');
+$route->map('', [HomeController::class, 'index']);
 
 

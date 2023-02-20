@@ -2,181 +2,221 @@
 /*
  * This file is part of the GiGaFlow package.
  *
- * (c) Giuseppe Galari <giga.webdev@protonmail.com>
+ * (c) Giuseppe Galari <gigaprog@proton.me>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace Src\Router;
 
-use http\Exception\UnexpectedValueException;
-use Exception;
+use \Exception;
+use Src\Http\Request;
 
 /**
- * Manage routing table and dispatch the http requests to application
- *
- * @package Src\Router
- * @author GiGa <giga.webdev@protonmail.com>
+ * 
+ * @package GiGaFlow\Router
+ * @author Giuseppe Galari <gigaprog@proton.me>
  * @version 1.0.0
+ * @see RouterInterface
  */
 class Router implements RouterInterface
 {
-    /** @var array */
-    protected array $params;
+  /** 
+   * Classes and methods to process in order to url matched by route.
+   * 
+   * @access protected
+   * @var array 
+   */
+  protected array $params = [];
 
-    /** @var array  */
-    protected array $routes;
+  /** 
+   * Routes to process.
+   * 
+   * @access protected 
+   * @var array  
+   */
+  protected array $routes = [];
 
-    /** @var string  */
-    protected string $defaultController = "HomeController";
+  /**
+   * Create a new instance of Request class.
+   *
+   * @access protected
+   * @var object
+   */
+  protected object $request;
 
-    /** @var string  */
-    protected string $defaultAction = "indexAction";
+  /**
+   * Constructor.
+   *
+   * @param Request $request
+   */
+  public function __construct(Request $request)
+  {
+    $this->request = $request;
+  }
 
-    /** @var string  */
-    protected string $controllerSuffix = "Controller";
+  /**
+   * @inheritDoc
+   *
+   * @param string $route
+   * @param string $params
+   * @return array
+   */
+  public function map(string $route, array $params): array
+  {
+    $route = preg_replace('/\//', '\\/', $route);
+    $route = preg_replace("/{([a-z]+)}/", "([a-z0-9\-]+)", $route);
+    $regexRoute = "/^" . $route . "$/";
+    $this->routes[$regexRoute][] = $params;
 
-    /** @var string  */
-    protected string $actionSuffix = "Action";
+    return $this->routes;
+  }
 
-    /** @var string  */
-    protected string $namespace = "App\Controllers\\";
+  /**
+   * Mapping GET method request.
+   *
+   * @param string $path
+   * @param array $params
+   * @return mixed
+   */
+  public function get(string $path, array $params): mixed
+  {
+    if ($this->request->method() === 'get') {
+      return $this->map($path, $params);
+    }
 
+    return null;
+  }
 
-    /**
-     * @inheritDoc
-     *
-     * @param string $routes
-     * @param string $params
-     * @param string|null $namespace
-     * @return array
-     */
-    public function map(string $routes, string $params, string $namespace = null): array
-    {
-        $routes = preg_replace('/\//', '\\/', $routes);
-        $routes = preg_replace("/{([a-z]+)}/", "([a-z0-9]+)", $routes);
-        $regexRoute = "/^" . $routes . "$/";
-        $param = explode('@', $params);
-        $this->routes[$regexRoute] = $param;
-        if ($namespace !== null) {
-            $this->routes[$regexRoute]['namespace'] = $namespace;
+  /**
+   * Mapping POST method request.
+   *
+   * @param string $path
+   * @param array $params
+   * @return mixed
+   */
+  public function post(string $path, array $params): mixed
+  {
+    if ($this->request->method() === 'post') {
+      return $this->map($path, $params);
+    }
+
+    return null;
+  }
+
+  /**
+   * Mapping PUT method request.
+   *
+   * @param string $path
+   * @param array $params
+   * @return mixed
+   */
+  public function put(string $path, array $params): mixed
+  {
+    if ($this->request->method() === 'put') {
+      $this->map($path, $params);
+    }
+
+    return null;
+  }
+
+  /**
+   * Mapping PATCH method request.
+   *
+   * @param string $path
+   * @param array $params
+   * @return mixed
+   */
+  public function patch(string $path, array $params): mixed
+  {
+    if ($this->request->method() === 'patch') {
+      $this->map($path, $params);
+    }
+
+    return null;
+  }
+
+  /**
+   * Mapping DELETE method request.
+   *
+   * @param string $path
+   * @param array $params
+   * @return mixed
+   */
+  public function delete(string $path, array $params): mixed
+  {
+    if ($this->request->method() === 'delete') {
+      $this->map($path, $params);
+    }
+    
+    return null;
+  }
+
+  public function option(string $path, array $params)
+  {
+    if ($this->request->method() === 'options') {
+      header('Access-Control-Allow-Methods: POST, OPTIONS');
+      header('Access-Control-Allow-Headers: Content-Type');
+      header('Access-Control-max-Age: 86400');
+      $this->map($path, $params);
+    }
+  }
+
+  /**
+   * @inheritDoc
+   *
+   * @param string $url
+   * @return mixed
+   * @throws Exception
+   */
+  public function match(string $url): mixed
+  {
+    $paramValue = null;
+    
+    foreach ($this->routes as $route => $param) {
+      // $param get route table 1. controller 2. action
+      if (preg_match($route, $url, $matches)) {
+        if (in_array($this->request->uri(), $matches)) {
+          $controller = $this->routes[$route][0][0];
+          
+          if (isset($matches[0])) {
+            $action = $param[0][1];
+          } else {
+            $action = $this->routes[$route][0][1];
+          }
+          if (isset($matches[1])) {
+            $paramValue = $matches[1];
+          }
+          
+          return $this->dispatch($controller, $action, $paramValue);
         }
-        
-        return $this->routes;
+      }
     }
+  }
 
-    /**
-     * Set namespace
-     *
-     * @return 
-     */
-    protected function getNamespace($controller)
-    {
-        foreach($this->routes as $route) {
-            if (in_array($controller, $route)) {
-                if (isset($route['namespace'])) {
-                    return "App\Controllers\\" . ucfirst($route['namespace']) . "\\";
-                }
-                
-            }
-        }
-       
-        return $this->namespace;
-        
+  /**
+   * @inheritDoc
+   *
+   * @param string $controller
+   * @param string $action
+   * @param string|null $params
+   * @throws Exception
+   */
+  public function dispatch(string $controller, string $action, string|null $params): void
+  {
+    if (class_exists($controller)) {
+      $obj = new $controller();
+      if (method_exists($obj, $action)) {
+        call_user_func_array([$obj, $action], [$params]);
+      } else {
+        throw new \Exception("Method not found");
+      }
+    } else {
+      dd($controller);
+      throw new \Exception("Class not found");
     }
-
-    /**
-     * Match the route to the routes in the routing table, setting the $this->params property
-     * if a route is found
-     *
-     * @param $url
-     * @return bool
-     */
-    public function match($controller, $action, $param)
-    {
-        $class = $this->getNamespace($controller) . $controller;
-        if (class_exists($class)) {
-            $instanceOfClass = new $class();
-            if (method_exists($instanceOfClass, $action)) {
-                call_user_func_array([$instanceOfClass, $action], [$param]);
-            }
-        } else {
-            echo "Class not found";
-        }
-       
-    }
-
-
-    /**
-     * @param string $path
-     * 
-     * @return [type]
-     */
-    public function dispatch(string $path)
-    {
-        $url = explode('/', $path);
-        
-        foreach ($this->routes as $k => $route) {
-            if (preg_match($k, $path)) {
-                $controller = $route[0];
-                $action = $route[1];
-                if (isset($url[3])) {
-                    $param = $url[3];
-                } else {
-                    $param = "";
-                }
-            } 
-        }
-
-        return $this->match($controller, $action, $param);       
-    }
-
-    /**
-     * Convert the string with hyphens to StudlyCaps,
-     * e.g. post-authors => PostAuthors
-     *
-     * @param string $string The string to convert
-     *
-     * @return string
-     */
-    protected function convertToStudlyCaps(string $string): string
-    {
-        return str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
-    }
-
-    /**
-     * Convert the string with hyphens to camelCase,
-     * e.g. add-new => addNew
-     *
-     * @param string $string The string to convert
-     *
-     * @return string
-     */
-    protected function convertToCamelCase(string $string): string
-    {
-        return lcfirst($this->convertToStudlyCaps($string));
-    }
-
-    /**
-     * Remove query string variables
-     *
-     * @param string $url
-     * @return mixed|string
-     */
-    protected function removeQueryStringVariables(string $url) : string
-    {
-        if ($url != 'index.php') {
-            $partUrl = explode('&', $url, 3);
-            if (strpos($partUrl[1], '=') === false) {
-                $url = $partUrl[1];
-            } else {
-                $url = '';
-            }
-        }
-
-        return $url;
-    }
-
+  }
 }

@@ -2,7 +2,7 @@
 /*
  * This file is part of the GiGaFlow package.
  *
- * (c) Giuseppe Galari <gigaprog@protonmail.com>
+ * (c) Giuseppe Galari <gigaprog@proton.me>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,20 +14,20 @@ namespace Src\Application;
 use Exception;
 use Src\Router\Router;
 use Src\Router\RouterFactory;
-use Src\Session\Session;
 use Src\Session\SessionFactory;
+use Src\Authorization\AuthorizationFactory;
 
 /**
- * Running the application
- *
- * @package Src
- * @author GiGa <gigaprog@protonmail.com>
+ * 
+ * @package GiGaFlow\Application
+ * @author Giuseppe Galari <gigaprog@proton.me>
  * @version 1.0.0
+ * @see Controller
  */
 class Application
 {
     /**
-     * Load all method to running the application.
+     * Load all methods to running the application.
      *
      * @return self
      * @throws Exception
@@ -37,9 +37,13 @@ class Application
         if (version_compare(PHP_VERSION, $appVersion = Config::$appVersion, '<')) {
             die(sprintf("Your PHP Version is %s, but for running correctly the application is needed the %s version.", PHP_VERSION, $appVersion));
         }
+        
         $this->initSession();
-        $this->errorHandling();
-        $this->routing();  
+        
+        //$this->errorHandling();  
+        //$this->initAuthorization();
+        
+        $this->initRouter();
         
         return $this;
     }
@@ -57,10 +61,11 @@ class Application
     }
 
     /**
-     * Initialized a session
+     * Initialize a session
+     * 
      * @return void
      */
-    private function initSession(): void
+    protected function initSession(): void
     {
         SessionFactory::build();
     }
@@ -71,10 +76,19 @@ class Application
      * @throws Exception
      * @return Router
      */
-    protected function routing(): Router
+    protected function initRouter(): Router
     {
         return RouterFactory::build();
     }
 
+    /**
+     * Initialize Authorization class.
+     *
+     * @return string
+     */
+    protected function initAuthorization(): ?string
+    {
+        return AuthorizationFactory::build();
+    }
 
 }

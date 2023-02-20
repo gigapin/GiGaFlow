@@ -2,7 +2,7 @@
 /*
  * This file is part of the GiGaFlow package.
  *
- * (c) Giuseppe Galari <gigaprog@protonmail.com>
+ * (c) Giuseppe Galari <gigaprog@proton.me>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,21 +12,35 @@ declare(strict_types=1);
 namespace Src\Application;
 
 /**
- * Variables of configuration of the application
- *
- * @package Src\Application
- * @author GiGa <gigaprog@protonmail.com>
+ * 
+ * @package GiGaFlow\Config
+ * @author Giuseppe Galari <gigaprog@proton.me>
  * @version 1.0.0
  */
 class Config
 {
-    /** @var string PHP Version required */
+    /** 
+     * PHP Version required.
+     * 
+     * @static
+     * @var string  $phpVersion
+     */
     public static string $phpVersion = "7.4";
 
-    /** @var string Version about application */
+    /** 
+     * Version of the application.
+     * 
+     * @var string $appVersion
+     * @static
+     */
     public static string $appVersion = "1.0";
 
-    /** @var int Setting time life of the cookies */
+    /** 
+     * Setting time life of the cookies.
+     * 
+     * @static
+     * @var int $cookie_lifetime
+     */
     public static int $cookie_lifetime = 86400;
 
 }

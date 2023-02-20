@@ -2,7 +2,7 @@
 /*
  * This file is part of the GiGaFlow package.
  *
- * (c) Giuseppe Galari <gigaprog@protonmail.com>
+ * (c) Giuseppe Galari <gigaprog@proton.me>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,10 +14,11 @@ namespace Src\ErrorHandling;
 
 use \Exception;
 use Src\View;
-
 /**
- * Class Error
- * @package Core
+ * 
+ * @package GiGaFlow\ErrorHandling
+ * @author Giuseppe Galari <gigaprog@proton.me>
+ * @version 1.0.0
  */
 class Error
 {
@@ -80,6 +81,8 @@ class Error
     }
 
     /**
+     * Writing errors log.
+     * 
      * @param $exception
      * @throws Exception
      */
@@ -97,6 +100,4 @@ class Error
         $message .= "\nThrown in '" . $exception->getFile() . "' on line " . $exception->getLine();
         error_log($message, 3, $log);
     }
-
-
 }

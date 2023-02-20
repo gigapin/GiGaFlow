@@ -2,37 +2,41 @@
 /*
  * This file is part of the GiGaFlow package.
  *
- * (c) Giuseppe Galari <gigaprog@protonmail.com>
+ * (c) Giuseppe Galari <gigaprog@proton.me>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+declare(strict_types=1);
+
 namespace Src\Http;
 
 /**
- * manage redirect to another url
- *
- * @package Src
- * @author GiGa <gigaprog@protonmail.com>
+ * @package GiGaFlow\Http
+ * @author Giuseppe Galari <gigaprog@proton.me>
  * @version 1.0.0
  */
 class Redirect
 {
     /**
-     * @param $path
+     * Redirect to a new path.
+     * 
+     * @param string $path
+     * @return void
      */
-    public static function to($path)
+    public static function to(string $path): void
     {
         $host  = $_SERVER['HTTP_HOST'];
-        $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+        $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
         header("Location: http://$host$uri/$path");
-
     }
 
     /**
-     * Redirect to back page
+     * Go back page.
+     * 
+     * @return void
      */
-    public static function back()
+    public static function back(): void
     {
         header('Location: ' . $_SERVER['REQUEST_URI']);
     }

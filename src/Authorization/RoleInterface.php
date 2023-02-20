@@ -9,30 +9,15 @@
  */
 declare(strict_types=1);
 
-namespace Src\Database;
-
-use PDO;
+namespace Src\Authorization;
 
 /**
  * 
- * @package GiGaFlow\Database
+ * @package GiGaFlow\Application
  * @author Giuseppe Galari <gigaprog@proton.me>
  * @version 1.0.0
  */
-interface DatabaseConnectionInterface
+interface RoleInterface
 {
-    /**
-     * Start database connection
-     *
-     * @return PDO
-     */
-    public function open(): PDO;
-
-    /**
-     * Close database connection
-     *
-     * @return mixed
-     */
-    public function close(): ?PDO;
-
+  
 }

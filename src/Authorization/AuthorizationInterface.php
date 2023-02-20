@@ -9,30 +9,23 @@
  */
 declare(strict_types=1);
 
-namespace Src\Database;
-
-use PDO;
+namespace Src\Authorization;
 
 /**
- * 
- * @package GiGaFlow\Database
+ * @package GiGaFlow\Authorization
  * @author Giuseppe Galari <gigaprog@proton.me>
  * @version 1.0.0
  */
-interface DatabaseConnectionInterface
+interface AuthorizationInterface
 {
-    /**
-     * Start database connection
-     *
-     * @return PDO
-     */
-    public function open(): PDO;
-
-    /**
-     * Close database connection
-     *
-     * @return mixed
-     */
-    public function close(): ?PDO;
-
+  /**
+   * Verify if is active a user session and 
+   * if URL is different from login or register 
+   * raise an exception.
+   *
+   * @throws \Exception
+   * @throws AuthException
+   * @return mixed
+   */
+  public function init();
 }

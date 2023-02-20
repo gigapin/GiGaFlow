@@ -1,38 +1,39 @@
 <?php
 /*
- * This file is part of the GiGaFlow package.
+ * This file is part of the GigaFlow package.
  *
- * (c) Giuseppe Galari <gigaprog@protonmail.com>
+ * (c) Giuseppe Galari <gigaprog@proton.me>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace Src\Session;
 
-use Src\Application\Config;
 use Src\Session\Session;
 
 /**
- * Initialize session class
- *
- * @package Src\Session
- * @author GiGa <gigaprog@protonmail.com>
+ * 
+ * @package GiGaFlow\Session
+ * @author Giuseppe Galari <gigaprog@proton.me>
  * @version 1.0.0
  */
 class SessionFactory
 {
-    /**
-     * @return Session|SessionInterface
-     */
-    public static function build()
-    {
-        $session = new Session();
-        if (! $session instanceof SessionInterface) {
-            throw new \UnexpectedValueException('Session class must implements session interface');
-        }
-
-        return $session->init();
+  /**
+   * @return mixed
+   * @static
+   * @throws \UnexpectedValueException
+   */
+  public static function build(): mixed
+  {
+    $session = new Session();
+    if (! $session instanceof SessionInterface) {
+      throw new \UnexpectedValueException('Session class must implements session interface');
     }
+
+    return $session->init();
+  }
 }

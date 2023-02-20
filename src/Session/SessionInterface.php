@@ -2,69 +2,74 @@
 /*
  * This file is part of the GiGaFlow package.
  *
- * (c) Giuseppe Galari <gigaprog@protonmail.com>
+ * (c) Giuseppe Galari <gigaprog@proton.me>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace Src\Session;
 
 /**
- * Session Interface
- *
- * @package Src\Seeeion
- * @author GiGa <gigaprog@protonmail.com>
+ * 
+ * @package GiGaFlow\Session
+ * @author Giuseppe Galari <gigaprog@proton.me>
  * @version 1.0.0
  */
 interface SessionInterface
 {
-    /**
-     * Set a session
-     *
-     * @param string $name
-     * @param string $value
-     * @return mixed
-     */
-    public static function set(string $name, string $value);
+  /**
+   * Set a session/
+   *
+   * @param string $name
+   * @param mixed $value
+   * @static
+   * @return mixed
+   */
+  public static function set(string $name, mixed $value): mixed;
 
-    /**
-     * Get value about a session
-     *
-     * @param string $name
-     * @return mixed
-     */
-    public static function get(string $name);
+  /**
+   * Get value about a session
+   *
+   * @param string $name
+   * @static
+   * @return mixed
+   */
+  public static function get(string $name): mixed;
 
-    /**
-     * Check if a session is active
-     *
-     * @param string $name
-     * @return bool
-     */
-    public static function has(string $name): bool;
+  /**
+   * Check if a session is active
+   *
+   * @param string $name
+   * @static
+   * @return bool
+   */
+  public static function has(string $name): bool;
 
-    /**
-     * Remove a session
-     *
-     * @param string $name
-     * @return mixed
-     */
-    public static function remove(string $name);
+  /**
+   * Remove a session
+   *
+   * @param string $name
+   * @static
+   * @return void
+   */
+  public static function remove(string $name): void;
 
-    /**
-     * Destroy all sessions active
-     *
-     * @param string $name
-     * @return mixed
-     */
-    public static function destroy(string $name);
+  /**
+   * Destroy all sessions active
+   *
+   * @param string $name
+   * @static
+   * @return mixed
+   */
+  public static function destroy(string $name): mixed;
 
-    /**
-     * Start a session
-     *
-     * @return mixed
-     */
-    public static function init();
+  /**
+   * Start a session
+   *
+   * @return void
+   */
+  public function init(): void;
 }

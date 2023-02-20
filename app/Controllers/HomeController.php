@@ -7,7 +7,7 @@ use Src\Controller;
 
 class HomeController extends Controller
 {
-    public function indexAction()
+    public function index()
     {
 
     }
